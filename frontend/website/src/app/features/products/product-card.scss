@@ -1,0 +1,193 @@
+@use '../../../styles.scss' as *;
+
+.card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.25s ease;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-8px);
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.35);
+
+    .card__img {
+      transform: scale(1.07);
+    }
+
+    .card__btn-add {
+      background: linear-gradient(135deg, var(--color-accent-primary), #4338ca);
+      box-shadow: 0 6px 18px -3px rgba(99, 102, 241, 0.45);
+    }
+  }
+
+  &__media {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    background: radial-gradient(circle at center, var(--color-bg-elevated) 0%, var(--color-bg-surface) 100%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  &__category-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(14, 19, 31, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.8rem;
+    border-radius: var(--radius-full);
+    z-index: 2;
+  }
+
+  &__stock-pill {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(16, 185, 129, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #10b981;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-full);
+    z-index: 2;
+
+    [data-theme="dark"] &,
+    .theme-dark & {
+      color: #34d399;
+    }
+
+    &--low {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #f59e0b;
+
+      [data-theme="dark"] &,
+      .theme-dark & {
+        color: #fbbf24;
+      }
+    }
+  }
+
+  &__content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background-color: var(--color-bg-surface);
+  }
+
+  &__title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-main);
+    margin-bottom: 0.45rem;
+    line-height: 1.3;
+  }
+
+  &__desc {
+    color: var(--color-text-muted);
+    font-size: 0.88rem;
+    line-height: 1.55;
+    margin-bottom: 1.5rem;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  &__price-box {
+    display: flex;
+    align-items: baseline;
+    gap: 0.15rem;
+  }
+
+  &__price-currency {
+    color: var(--color-accent-primary);
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  &__price-amount {
+    font-family: var(--font-display);
+    font-size: 1.65rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text-main);
+  }
+
+  &__btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-subtle);
+    color: var(--color-text-main);
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 0.88rem;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+    i {
+      font-size: 0.82rem;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, var(--color-accent-primary), #4338ca);
+      color: #ffffff;
+      border-color: transparent;
+      transform: translateY(-2px);
+
+      i {
+        transform: rotate(90deg);
+      }
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent-primary);
+      outline-offset: 2px;
+    }
+  }
+}

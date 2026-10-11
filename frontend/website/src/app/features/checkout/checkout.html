@@ -1,0 +1,207 @@
+<section class="checkout-page">
+  <div class="checkout-page__container">
+    <div class="checkout-page__header">
+      <div class="checkout-page__breadcrumbs">
+        <a routerLink="/" class="checkout-page__back-link">
+          <i class="fa-solid fa-arrow-left"></i> Back to Store
+        </a>
+      </div>
+      <h1 class="checkout-page__title">Secure Express Checkout</h1>
+      <p class="checkout-page__subtitle">Select your delivery address and instant UPI / Razorpay payment mode</p>
+    </div>
+
+    @if (cartItems().length === 0) {
+      <div class="checkout-page__empty">
+        <i class="fa-solid fa-cart-shopping checkout-page__empty-icon"></i>
+        <h2>Your Shopping Bag is Empty</h2>
+        <p>You need at least one product in your cart before proceeding to checkout.</p>
+        <a routerLink="/" class="btn-primary">Browse Catalog</a>
+      </div>
+    } @else {
+      <div class="checkout-layout">
+        <!-- Delivery Details & Payment Form -->
+        <div class="checkout-form-col">
+          <!-- Step 1: Address -->
+          <div class="checkout-card">
+            <div class="checkout-card__head">
+              <span class="step-num">1</span>
+              <h3>Delivery & Shipping Information</h3>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group form-group--full">
+                <label>Full Recipient Name</label>
+                <input
+                  type="text"
+                  [ngModel]="shippingFullName()"
+                  (ngModelChange)="shippingFullName.set($event)"
+                  placeholder="e.g. Hrushikesh Surkar">
+              </div>
+
+              <div class="form-group form-group--full">
+                <label>Street Address / Apartment / Suite</label>
+                <input
+                  type="text"
+                  [ngModel]="shippingAddress()"
+                  (ngModelChange)="shippingAddress.set($event)"
+                  placeholder="e.g. 742 Evergreen Terrace, Sector 4">
+              </div>
+
+              <div class="form-group">
+                <label>City</label>
+                <input
+                  type="text"
+                  [ngModel]="shippingCity()"
+                  (ngModelChange)="shippingCity.set($event)"
+                  placeholder="e.g. Mumbai">
+              </div>
+
+              <div class="form-group">
+                <label>Postal / PIN Code</label>
+                <input
+                  type="text"
+                  [ngModel]="shippingZip()"
+                  (ngModelChange)="shippingZip.set($event)"
+                  placeholder="e.g. 400001">
+              </div>
+
+              <div class="form-group form-group--full">
+                <label>Mobile Number for Delivery Updates</label>
+                <input
+                  type="text"
+                  [ngModel]="shippingPhone()"
+                  (ngModelChange)="shippingPhone.set($event)"
+                  placeholder="+91 98765 43210">
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Payment Method -->
+          <div class="checkout-card">
+            <div class="checkout-card__head">
+              <span class="step-num">2</span>
+              <h3>Payment Method</h3>
+            </div>
+
+            <div class="payment-options">
+              <!-- UPI Payment -->
+              <label class="pay-option" [class.pay-option--active]="paymentMethod() === 'upi'">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="upi"
+                  [ngModel]="paymentMethod()"
+                  (ngModelChange)="paymentMethod.set($event)">
+                <div class="pay-option__body">
+                  <div class="pay-option__title-row">
+                    <span class="pay-option__title">
+                      <i class="fa-solid fa-mobile-screen-button"></i> Instant UPI (GPay, PhonePe, Paytm, BHIM)
+                    </span>
+                    <span class="pay-pill">Recommended</span>
+                  </div>
+                  <p class="pay-option__desc">Fastest checkout with real 0-fee UPI QR & VPA auto-redirect via Razorpay gateway.</p>
+                </div>
+              </label>
+
+              <!-- Razorpay Card / Netbanking -->
+              <label class="pay-option" [class.pay-option--active]="paymentMethod() === 'razorpay'">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="razorpay"
+                  [ngModel]="paymentMethod()"
+                  (ngModelChange)="paymentMethod.set($event)">
+                <div class="pay-option__body">
+                  <div class="pay-option__title-row">
+                    <span class="pay-option__title">
+                      <i class="fa-solid fa-credit-card"></i> Razorpay Gateway (Cards & NetBanking)
+                    </span>
+                  </div>
+                  <p class="pay-option__desc">Supports all Visa, Mastercard, RuPay, and NetBanking accounts securely.</p>
+                </div>
+              </label>
+
+              <!-- Cash On Delivery -->
+              <label class="pay-option" [class.pay-option--active]="paymentMethod() === 'cod'">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="cod"
+                  [ngModel]="paymentMethod()"
+                  (ngModelChange)="paymentMethod.set($event)">
+                <div class="pay-option__body">
+                  <div class="pay-option__title-row">
+                    <span class="pay-option__title">
+                      <i class="fa-solid fa-truck-fast"></i> Cash on Delivery (COD)
+                    </span>
+                  </div>
+                  <p class="pay-option__desc">Pay in cash or UPI scanner directly to the courier upon doorstep delivery.</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Summary Sidebar -->
+        <div class="checkout-summary-col">
+          <div class="summary-card">
+            <h3 class="summary-card__title">Order Summary</h3>
+
+            <div class="summary-items">
+              @for (item of cartItems(); track item.product.id) {
+                <div class="summary-item">
+                  <img [src]="item.product.image_url" [alt]="item.product.name" class="summary-item__img">
+                  <div class="summary-item__meta">
+                    <span class="summary-item__name">{{ item.product.name }}</span>
+                    <span class="summary-item__qty">Qty: {{ item.quantity }}</span>
+                  </div>
+                  <span class="summary-item__price">\${{ (item.product.price * item.quantity).toFixed(2) }}</span>
+                </div>
+              }
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-rows">
+              <div class="summary-row">
+                <span>Cart Subtotal</span>
+                <span>\${{ cartTotal().toFixed(2) }}</span>
+              </div>
+              <div class="summary-row">
+                <span>Express Insured Shipping</span>
+                <span class="text-free">FREE</span>
+              </div>
+              <div class="summary-row">
+                <span>GST & Service Taxes</span>
+                <span>\${{ (cartTotal() * 0.18).toFixed(2) }}</span>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="summary-row summary-row--grand">
+                <span>Final Payable</span>
+                <span class="text-grand">\${{ (cartTotal() * 1.18).toFixed(2) }}</span>
+              </div>
+            </div>
+
+            <button
+              class="btn-pay"
+              [disabled]="isProcessing()"
+              (click)="processPayment()">
+              @if (isProcessing()) {
+                <i class="fa-solid fa-circle-notch fa-spin"></i>
+                <span>Opening Gateway...</span>
+              } @else {
+                <i class="fa-solid fa-lock"></i>
+                <span>Pay \${{ (cartTotal() * 1.18).toFixed(2) }} via {{ paymentMethod() | uppercase }}</span>
+              }
+            </button>
+
+            <div class="security-guarantee">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>256-Bit SSL Encryption • PCI-DSS Level 1 Razorpay Certified</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>

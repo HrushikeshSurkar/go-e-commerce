@@ -1,0 +1,86 @@
+<div class="app-layout">
+  <app-navbar
+    [searchQuery]="searchQuery()"
+    (searchQueryChange)="onSearchChange($event)"
+    (openCart)="isCartOpen.set(true)"
+    (openAuthModal)="isAuthModalOpen.set(true)">
+  </app-navbar>
+
+  <main class="app-layout__main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="app-footer">
+    <div class="app-footer__container">
+      <!-- Brand & Mission -->
+      <div class="app-footer__brand">
+        <div class="app-footer__logo">
+          <i class="fa-solid fa-bolt"></i>
+          <span>NEXUS</span>
+        </div>
+        <p class="app-footer__tagline">
+          Curated premium tech, precision audio, and minimalist workspace essentials designed for high performers worldwide.
+        </p>
+        <div class="app-footer__socials">
+          <a href="#" class="social-icon" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-icon" aria-label="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-icon" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="social-icon" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="app-footer__links">
+        <div class="app-footer__col">
+          <span class="app-footer__heading">Shop Collection</span>
+          <a routerLink="/" class="app-footer__link">Flagship Audio</a>
+          <a routerLink="/" class="app-footer__link">Workspace Aesthetics</a>
+          <a routerLink="/" class="app-footer__link">Wearables & Gear</a>
+          <a routerLink="/" class="app-footer__link">New Arrivals</a>
+        </div>
+        <div class="app-footer__col">
+          <span class="app-footer__heading">Customer Care</span>
+          <a routerLink="/orders" class="app-footer__link">Track Order</a>
+          <a routerLink="/orders" class="app-footer__link">Returns & Refunds</a>
+          <a routerLink="/profile" class="app-footer__link">Account Security</a>
+          <a routerLink="/" class="app-footer__link">Help & FAQs</a>
+        </div>
+        <div class="app-footer__col">
+          <span class="app-footer__heading">Company</span>
+          <a routerLink="/" class="app-footer__link">Our Story</a>
+          <a routerLink="/" class="app-footer__link">Sustainability</a>
+          <a routerLink="/" class="app-footer__link">Privacy Policy</a>
+          <a routerLink="/" class="app-footer__link">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="app-footer__bottom">
+      <div class="app-footer__copyright">
+        <span>&copy; 2026 NEXUS Luxury Retail Inc. All rights reserved.</span>
+      </div>
+
+      <div class="app-footer__badges">
+        <span class="pay-badge" title="UPI Payment"><i class="fa-solid fa-mobile-screen-button"></i> Instant UPI</span>
+        <span class="pay-badge" title="Razorpay Secure"><i class="fa-solid fa-shield-halved"></i> 256-Bit SSL</span>
+        <span class="pay-badge" title="Express Delivery"><i class="fa-solid fa-plane-departure"></i> Priority Shipping</span>
+      </div>
+    </div>
+  </footer>
+
+  @if (isCartOpen()) {
+    <app-cart-drawer
+      (close)="isCartOpen.set(false)"
+      (requireAuth)="isAuthModalOpen.set(true)">
+    </app-cart-drawer>
+  }
+
+  @if (isAuthModalOpen()) {
+    <app-auth-dialog
+      (close)="isAuthModalOpen.set(false)">
+    </app-auth-dialog>
+  }
+
+  <app-toast-container></app-toast-container>
+</div>

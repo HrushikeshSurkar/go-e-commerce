@@ -1,0 +1,270 @@
+<div class="admin-page">
+  <div class="admin-page__container">
+    <!-- Header -->
+    <div class="admin-page__header">
+      <div>
+        <div class="admin-page__breadcrumbs">
+          <a routerLink="/" class="admin-page__back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Store
+          </a>
+        </div>
+        <h1 class="admin-page__title">Enterprise Operations Portal</h1>
+        <p class="admin-page__subtitle">Full User Directory CRUD, Order Processing & Inventory State</p>
+      </div>
+
+      <div class="admin-page__actions">
+        @if (currentTab() === 'users') {
+          <button class="btn-create" (click)="openCreateUser()">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Add New User</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (!authService.isAdmin()) {
+      <div class="admin-page__forbidden">
+        <i class="fa-solid fa-shield-halved admin-page__lock-icon"></i>
+        <h2>Restricted Administrator Area</h2>
+        <p>Your current session does not possess Administrative privileges. Please sign in as an administrator.</p>
+        <a routerLink="/" class="btn-primary">Return to Storefront</a>
+      </div>
+    } @else {
+      <!-- Tabs -->
+      <nav class="admin-page__tabs" aria-label="Admin Navigation Tabs">
+        <button
+          class="admin-page__tab"
+          [class.admin-page__tab--active]="currentTab() === 'users'"
+          (click)="currentTab.set('users')">
+          <i class="fa-solid fa-users"></i>
+          <span>User Directory ({{ users().length }})</span>
+        </button>
+        <button
+          class="admin-page__tab"
+          [class.admin-page__tab--active]="currentTab() === 'orders'"
+          (click)="currentTab.set('orders')">
+          <i class="fa-solid fa-dolly"></i>
+          <span>Global Orders ({{ allOrders().length }})</span>
+        </button>
+      </nav>
+
+      <!-- User Management Table -->
+      @if (currentTab() === 'users') {
+        <section class="admin-card">
+          <div class="admin-card__head">
+            <h2 class="admin-card__title">User Accounts Database</h2>
+            <button class="admin-card__refresh" (click)="loadUsers()" title="Refresh users list">
+              <i class="fa-solid fa-rotate-right"></i>
+            </button>
+          </div>
+
+          @if (isUsersLoading()) {
+            <div class="admin-card__loading">
+              <div class="spinner-pulse"></div>
+              <span>Querying PostgreSQL user table...</span>
+            </div>
+          } @else if (users().length === 0) {
+            <div class="admin-card__empty">No users found in database.</div>
+          } @else {
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>UID</th>
+                    <th>User / Name</th>
+                    <th>Email Address</th>
+                    <th>Role</th>
+                    <th>Created</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (user of users(); track user.id) {
+                    <tr>
+                      <td class="data-table__mono">#{{ user.id }}</td>
+                      <td>
+                        <div class="user-cell">
+                          <div class="user-cell__avatar">
+                            {{ user.name[0]?.toUpperCase() || 'U' }}
+                          </div>
+                          <span class="user-cell__name">{{ user.name }}</span>
+                        </div>
+                      </td>
+                      <td class="data-table__mono">{{ user.email }}</td>
+                      <td>
+                        <span class="role-pill role-pill--{{ user.role }}">
+                          {{ user.role | uppercase }}
+                        </span>
+                      </td>
+                      <td class="data-table__dim">
+                        {{ user.created_at ? (user.created_at | date:'mediumDate') : 'System' }}
+                      </td>
+                      <td style="text-align: right;">
+                        <div class="btn-group">
+                          <button class="btn-icon" (click)="openEditUser(user)" title="Edit User">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                          </button>
+                          <button class="btn-icon btn-icon--danger" (click)="deleteUser(user)" title="Delete User">
+                            <i class="fa-solid fa-trash-can"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      }
+
+      <!-- Global Orders Management Table -->
+      @if (currentTab() === 'orders') {
+        <section class="admin-card">
+          <div class="admin-card__head">
+            <h2 class="admin-card__title">All Customer Orders Ledger</h2>
+            <button class="admin-card__refresh" (click)="loadOrders()" title="Refresh orders list">
+              <i class="fa-solid fa-rotate-right"></i>
+            </button>
+          </div>
+
+          @if (isOrdersLoading()) {
+            <div class="admin-card__loading">
+              <div class="spinner-pulse"></div>
+              <span>Querying orders & order_items...</span>
+            </div>
+          } @else if (allOrders().length === 0) {
+            <div class="admin-card__empty">No customer orders recorded yet.</div>
+          } @else {
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Items Summary</th>
+                    <th>Total Amount</th>
+                    <th>Current Status</th>
+                    <th>Change Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (order of allOrders(); track order.id) {
+                    <tr>
+                      <td class="data-table__mono"><strong>#{{ order.id }}</strong></td>
+                      <td>
+                        <div class="customer-info">
+                          <span class="customer-info__name">{{ order.user?.name || 'Customer' }}</span>
+                          <span class="customer-info__email">{{ order.user?.email || 'user_id ' + order.user_id }}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="order-items-snippet">
+                          {{ order.items?.length || 0 }} item(s)
+                          @if (order.items && order.items.length > 0) {
+                            <span class="data-table__dim">({{ order.items[0].product?.name || 'Item' }}...)</span>
+                          }
+                        </div>
+                      </td>
+                      <td class="data-table__price">\${{ order.total_amount.toFixed(2) }}</td>
+                      <td>
+                        <span class="order-status-badge order-status-badge--{{ order.status }}">
+                          {{ order.status | uppercase }}
+                        </span>
+                      </td>
+                      <td>
+                        <select
+                          class="status-select"
+                          [ngModel]="order.status"
+                          (ngModelChange)="updateOrderStatus(order, $event)">
+                          <option value="pending">Pending</option>
+                          <option value="paid">Paid</option>
+                          <option value="shipped">Shipped</option>
+                          <option value="delivered">Delivered</option>
+                          <option value="cancelled">Cancelled</option>
+                        </select>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      }
+    }
+  </div>
+
+  <!-- User Create / Edit Dialog -->
+  @if (isUserModalOpen()) {
+    <div class="user-dialog" role="dialog" aria-modal="true">
+      <div class="user-dialog__overlay" (click)="closeUserModal()"></div>
+      <div class="user-dialog__window">
+        <div class="user-dialog__header">
+          <h3 class="user-dialog__title">
+            {{ editingUser() ? 'Edit User #' + editingUser()?.id : 'Add New User Account' }}
+          </h3>
+          <button class="user-dialog__close" (click)="closeUserModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <form class="user-form" (submit)="$event.preventDefault()">
+          <div class="user-form__group">
+            <label class="user-form__label">Full Name</label>
+            <input
+              type="text"
+              class="user-form__input"
+              [ngModel]="formName()"
+              (ngModelChange)="formName.set($event)"
+              placeholder="e.g. Elena Rostova">
+          </div>
+
+          <div class="user-form__group">
+            <label class="user-form__label">Email Address</label>
+            <input
+              type="email"
+              class="user-form__input"
+              [ngModel]="formEmail()"
+              (ngModelChange)="formEmail.set($event)"
+              placeholder="elena@company.com">
+          </div>
+
+          <div class="user-form__group">
+            <label class="user-form__label">Role Assignment</label>
+            <select
+              class="user-form__input"
+              [ngModel]="formRole()"
+              (ngModelChange)="formRole.set($event)">
+              <option value="customer">Customer (Storefront shopper)</option>
+              <option value="admin">Admin (Full operations portal access)</option>
+            </select>
+          </div>
+
+          <div class="user-form__group">
+            <label class="user-form__label">
+              {{ editingUser() ? 'Password (Leave blank to keep unchanged)' : 'Initial Password' }}
+            </label>
+            <input
+              type="password"
+              class="user-form__input"
+              [ngModel]="formPassword()"
+              (ngModelChange)="formPassword.set($event)"
+              placeholder="••••••••">
+          </div>
+
+          <div class="user-form__actions">
+            <button type="button" class="btn-secondary" (click)="closeUserModal()">Cancel</button>
+            <button
+              type="button"
+              class="btn-primary"
+              [disabled]="isSubmitting()"
+              (click)="saveUser()">
+              {{ isSubmitting() ? 'Saving...' : (editingUser() ? 'Update User' : 'Create User') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

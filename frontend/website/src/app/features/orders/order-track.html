@@ -1,0 +1,105 @@
+<section class="track-page">
+  <div class="track-page__container">
+    <div class="track-page__header">
+      <div class="track-page__breadcrumbs">
+        <a routerLink="/orders" class="track-page__back-link">
+          <i class="fa-solid fa-arrow-left"></i> Back to My Orders
+        </a>
+      </div>
+      <h1 class="track-page__title">Package & Order Tracking</h1>
+      <p class="track-page__subtitle">Live milestone progress and courier routing state</p>
+    </div>
+
+    @if (isLoading()) {
+      <div class="track-page__loading">
+        <div class="spinner-pulse"></div>
+        <p>Connecting with courier dispatch telematics...</p>
+      </div>
+    } @else if (order(); as ord) {
+      <div class="track-card">
+        <!-- Top Status Banner -->
+        <div class="track-card__banner">
+          <div class="track-card__order-meta">
+            <span class="track-card__order-id">Tracking Order #{{ ord.id }}</span>
+            <span class="track-card__date">Placed on {{ ord.created_at | date:'medium' }}</span>
+          </div>
+          <span class="status-pill status-pill--{{ ord.status }}">
+            <i class="fa-solid fa-circle-dot"></i> {{ ord.status | uppercase }}
+          </span>
+        </div>
+
+        <!-- Visual Milestone Stepper -->
+        <div class="timeline">
+          @for (step of steps; track step.key; let idx = $index) {
+            <div
+              class="timeline__step"
+              [class.timeline__step--completed]="isStepCompleted(step.key, ord.status)"
+              [class.timeline__step--active]="isStepActive(step.key, ord.status)">
+              <div class="timeline__node">
+                <i class="fa-solid" [ngClass]="step.icon"></i>
+              </div>
+              @if (idx < steps.length - 1) {
+                <div class="timeline__line"></div>
+              }
+              <div class="timeline__content">
+                <h4 class="timeline__label">{{ step.label }}</h4>
+                <p class="timeline__desc">{{ step.desc }}</p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Shipment Metadata Grid -->
+        <div class="shipment-grid">
+          <div class="shipment-box">
+            <span class="shipment-box__label">Delivery Address</span>
+            <span class="shipment-box__val">{{ ord.shipping_address || 'Express Priority Delivery Address' }}</span>
+          </div>
+
+          <div class="shipment-box">
+            <span class="shipment-box__label">Payment Channel</span>
+            <span class="shipment-box__val">{{ ord.payment_method ? (ord.payment_method | uppercase) : 'UPI' }}</span>
+          </div>
+
+          @if (ord.razorpay_payment_id) {
+            <div class="shipment-box">
+              <span class="shipment-box__label">Gateway Reference</span>
+              <span class="shipment-box__val shipment-box__val--mono">{{ ord.razorpay_payment_id }}</span>
+            </div>
+          }
+
+          <div class="shipment-box">
+            <span class="shipment-box__label">Package Value</span>
+            <span class="shipment-box__val shipment-box__val--cyan">\${{ ord.total_amount.toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <!-- Itemized Products in Shipment -->
+        <div class="items-section">
+          <h3 class="items-section__title">Items in this Package</h3>
+          <div class="items-list">
+            @for (item of ord.items; track item.id) {
+              <div class="item-row">
+                <img
+                  [src]="item.product?.image_url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200'"
+                  [alt]="item.product?.name || 'Product'"
+                  class="item-row__img">
+                <div class="item-row__info">
+                  <span class="item-row__name">{{ item.product?.name || 'Curated Product' }}</span>
+                  <span class="item-row__meta">Quantity: {{ item.quantity }} × \${{ item.unit_price.toFixed(2) }}</span>
+                </div>
+                <span class="item-row__subtotal">\${{ (item.quantity * item.unit_price).toFixed(2) }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="track-card">
+        <h2>Order Not Found</h2>
+        <p>The order tracking ID is invalid or does not belong to your account.</p>
+        <a routerLink="/orders" class="btn-primary">View All Orders</a>
+      </div>
+    }
+  </div>
+</section>
