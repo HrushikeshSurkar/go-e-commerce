@@ -1,0 +1,75 @@
+<section class="success-page">
+  <div class="success-page__container">
+    @if (isLoading()) {
+      <div class="success-page__loading">
+        <div class="spinner-pulse"></div>
+        <p>Confirming transaction with payment gateway...</p>
+      </div>
+    } @else if (order(); as ord) {
+      <div class="success-card">
+        <div class="success-card__icon">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+
+        <span class="success-card__pill">Transaction Confirmed</span>
+        <h1 class="success-card__title">Thank You For Your Order!</h1>
+        <p class="success-card__subtitle">
+          Your payment was processed successfully. A confirmation summary has been saved to your account ledger.
+        </p>
+
+        <!-- Order Summary Details -->
+        <div class="order-receipt">
+          <div class="receipt-row">
+            <span class="receipt-row__label">Order Number</span>
+            <span class="receipt-row__val receipt-row__val--mono">#{{ ord.id }}</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-row__label">Payment Status</span>
+            <span class="receipt-row__val receipt-row__val--status receipt-row__val--{{ ord.status }}">
+              <i class="fa-solid fa-circle-dot"></i> {{ ord.status | uppercase }}
+            </span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-row__label">Payment Mode</span>
+            <span class="receipt-row__val">{{ ord.payment_method ? (ord.payment_method | uppercase) : 'UPI' }}</span>
+          </div>
+          @if (ord.razorpay_payment_id) {
+            <div class="receipt-row">
+              <span class="receipt-row__label">Razorpay Ref ID</span>
+              <span class="receipt-row__val receipt-row__val--mono">{{ ord.razorpay_payment_id }}</span>
+            </div>
+          }
+          <div class="receipt-row">
+            <span class="receipt-row__label">Delivery Address</span>
+            <span class="receipt-row__val">{{ ord.shipping_address || 'Express Priority Delivery' }}</span>
+          </div>
+          <div class="receipt-divider"></div>
+          <div class="receipt-row receipt-row--total">
+            <span>Total Amount Paid</span>
+            <span class="receipt-row__amount">\${{ ord.total_amount.toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <div class="success-card__actions">
+          <a [routerLink]="['/orders/track', ord.id]" class="btn-track">
+            <i class="fa-solid fa-location-crosshairs"></i>
+            <span>Track Order Status</span>
+          </a>
+          <a routerLink="/orders" class="btn-secondary">
+            <i class="fa-solid fa-receipt"></i>
+            <span>All Orders</span>
+          </a>
+          <a routerLink="/" class="btn-store">
+            <span>Continue Shopping</span>
+          </a>
+        </div>
+      </div>
+    } @else {
+      <div class="success-card">
+        <h2>Order Not Found</h2>
+        <p>We could not find the requested order reference.</p>
+        <a routerLink="/" class="btn-primary">Return Home</a>
+      </div>
+    }
+  </div>
+</section>

@@ -1,0 +1,108 @@
+<section class="profile-page">
+  <div class="profile-page__container">
+    <div class="profile-page__header">
+      <div class="profile-page__breadcrumbs">
+        <a routerLink="/" class="profile-page__back-link">
+          <i class="fa-solid fa-arrow-left"></i> Back to Store
+        </a>
+      </div>
+      <h1 class="profile-page__title">Account & Security</h1>
+      <p class="profile-page__subtitle">Manage your credentials, order status, and authentication state.</p>
+    </div>
+
+    @if (!authService.isAuthenticated()) {
+      <div class="profile-page__card profile-page__card--empty">
+        <i class="fa-solid fa-user-lock profile-page__lock-icon"></i>
+        <h2>Sign In Required</h2>
+        <p>Please authenticate into your Nexus account to view your user profile details.</p>
+        <a routerLink="/" class="btn-primary">Go to Home</a>
+      </div>
+    } @else {
+      <div class="profile-grid">
+        <!-- Identity Card -->
+        <div class="profile-card">
+          <div class="profile-card__avatar-section">
+            <div class="profile-card__avatar">
+              {{ (user()?.name || 'U')[0].toUpperCase() }}
+            </div>
+            <div class="profile-card__id-meta">
+              <h2 class="profile-card__name">{{ user()?.name }}</h2>
+              <span class="profile-card__role profile-card__role--{{ user()?.role }}">
+                <i class="fa-solid fa-shield-halved"></i>
+                {{ user()?.role | uppercase }} ACCOUNT
+              </span>
+            </div>
+          </div>
+
+          <div class="profile-card__divider"></div>
+
+          <div class="profile-card__details">
+            <div class="detail-row">
+              <span class="detail-row__label">Account Email</span>
+              <span class="detail-row__val">{{ user()?.email }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row__label">User ID (PostgreSQL)</span>
+              <span class="detail-row__val">#{{ user()?.id }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-row__label">Account Status</span>
+              <span class="detail-row__val detail-row__val--active">
+                <i class="fa-solid fa-circle-check"></i> Active & Verified
+              </span>
+            </div>
+          </div>
+
+          <div class="profile-card__actions">
+            <button class="btn-logout" (click)="logout()">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Sign Out of Session</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Links Card -->
+        <div class="profile-card">
+          <h3 class="profile-card__title">Quick Navigations</h3>
+
+          <div class="nav-tiles">
+            <a routerLink="/orders" class="nav-tile">
+              <div class="nav-tile__icon">
+                <i class="fa-solid fa-box-open"></i>
+              </div>
+              <div class="nav-tile__content">
+                <h4>My Order Ledger</h4>
+                <p>View your past purchases, shipment status, and invoices</p>
+              </div>
+              <i class="fa-solid fa-chevron-right nav-tile__arrow"></i>
+            </a>
+
+            @if (authService.isAdmin()) {
+              <a routerLink="/admin" class="nav-tile nav-tile--admin">
+                <div class="nav-tile__icon">
+                  <i class="fa-solid fa-screwdriver-wrench"></i>
+                </div>
+                <div class="nav-tile__content">
+                  <h4>Admin Operations Portal</h4>
+                  <p>Full User Directory CRUD, Global Orders & Stock Controls</p>
+                </div>
+                <i class="fa-solid fa-chevron-right nav-tile__arrow"></i>
+              </a>
+            }
+
+            <a routerLink="/" class="nav-tile">
+              <div class="nav-tile__icon">
+                <i class="fa-solid fa-store"></i>
+              </div>
+              <div class="nav-tile__content">
+                <h4>Return to Storefront</h4>
+                <p>Browse newly curated luxury electronics and workspace gear</p>
+              </div>
+              <i class="fa-solid fa-chevron-right nav-tile__arrow"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>

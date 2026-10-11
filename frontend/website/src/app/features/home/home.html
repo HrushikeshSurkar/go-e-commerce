@@ -1,0 +1,121 @@
+<!-- Luxury Hero Banner -->
+<section class="hero">
+  <div class="hero__glow-orb hero__glow-orb--primary"></div>
+  <div class="hero__glow-orb hero__glow-orb--secondary"></div>
+
+  <div class="hero__container">
+    <div class="hero__pill-tag">
+      <span class="hero__pulse-dot"></span>
+      <span>Next-Gen Audio & Ergonomic Gear • 2026 Edition</span>
+    </div>
+
+    <h1 class="hero__title">
+      Crafted for Visionaries.<br>
+      <span class="gradient-text-brand">Designed Without Compromise.</span>
+    </h1>
+
+    <p class="hero__subtitle">
+      Explore hand-selected flagship hardware, studio-grade acoustics, and refined accessories. Fast zero-fee UPI checkout, direct doorstep fulfillment, and genuine lifetime warranties.
+    </p>
+
+    <div class="hero__cta-group">
+      <a href="#catalog" class="btn-luxury-primary">
+        <i class="fa-solid fa-sparkles"></i>
+        <span>Explore Collection</span>
+      </a>
+      <div class="hero__perks-pill">
+        <i class="fa-solid fa-truck-fast"></i>
+        <span>Free Express Delivery on all orders</span>
+      </div>
+    </div>
+
+    <div class="hero__trust-strip">
+      <div class="trust-card">
+        <div class="trust-card__icon-box">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <div class="trust-card__info">
+          <span class="trust-card__title">Instant UPI & Cards</span>
+          <span class="trust-card__desc">Zero surcharge, Razorpay PCI-DSS certified</span>
+        </div>
+      </div>
+
+      <div class="trust-card__divider"></div>
+
+      <div class="trust-card">
+        <div class="trust-card__icon-box">
+          <i class="fa-solid fa-shield-check"></i>
+        </div>
+        <div class="trust-card__info">
+          <span class="trust-card__title">2-Year Replacement</span>
+          <span class="trust-card__desc">Hassle-free direct manufacturer coverage</span>
+        </div>
+      </div>
+
+      <div class="trust-card__divider"></div>
+
+      <div class="trust-card">
+        <div class="trust-card__icon-box">
+          <i class="fa-solid fa-box-check"></i>
+        </div>
+        <div class="trust-card__info">
+          <span class="trust-card__title">Live Telematics Tracking</span>
+          <span class="trust-card__desc">Milestone-level updates from warehouse to doorstep</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Curated Catalog Section -->
+<section class="catalog" id="catalog">
+  <div class="catalog__container">
+    <div class="catalog__header-wrap">
+      <div class="catalog__heading">
+        <span class="catalog__eyebrow">Flagship Store</span>
+        <h2 class="catalog__title">Featured Collection</h2>
+        <p class="catalog__subtitle">Hand-picked gear calibrated for speed, durability, and aesthetics</p>
+      </div>
+
+      <nav class="catalog__filters" aria-label="Product categories">
+        <button
+          class="catalog__filter-btn"
+          [class.catalog__filter-btn--active]="selectedCategory() === null"
+          (click)="selectCategory(null)">
+          <span>All Releases</span>
+        </button>
+        @for (cat of categories(); track cat.id) {
+          <button
+            class="catalog__filter-btn"
+            [class.catalog__filter-btn--active]="selectedCategory() === cat.id"
+            (click)="selectCategory(cat.id)">
+            <span>{{ cat.name }}</span>
+          </button>
+        }
+      </nav>
+    </div>
+
+    <!-- Products Grid -->
+    @if (isLoading()) {
+      <div class="catalog__loading">
+        <div class="spinner-pulse"></div>
+        <p>Syncing product catalog...</p>
+      </div>
+    } @else if (products().length === 0) {
+      <div class="catalog__empty">
+        <div class="catalog__empty-icon">
+          <i class="fa-regular fa-folder-open"></i>
+        </div>
+        <h3>No matching releases found</h3>
+        <p>Try switching to another category or clearing search parameters.</p>
+        <button class="catalog__empty-btn" (click)="selectCategory(null)">Reset All Filters</button>
+      </div>
+    } @else {
+      <div class="catalog__grid">
+        @for (prod of products(); track prod.id) {
+          <app-product-card [product]="prod" (add)="onAddToCart($event)"></app-product-card>
+        }
+      </div>
+    }
+  </div>
+</section>

@@ -1,0 +1,24 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries built with `go test -c`
+*.test
+
+# Code coverage profiles and other test artifacts
+*.out
+coverage.*
+
+# Dependency directories
+# (Only uncomment if you do not want to rely on the module cache or vendoring)
+# vendor/
+
+# Go workspaces configuration
+go.work
+go.work.sum
+
+# Common environment variables / secret files
+.env

@@ -1,0 +1,24 @@
+# Compiled binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+backend/backend.exe
+
+# Environment & Secret files
+.env
+backend/.env
+*.env.local
+
+# Node & Frontend dependencies/build
+node_modules/
+.angular/
+dist/
+.npm/
+
+# Logs & temp
+*.log
+scratch/
+.DS_Store
+Thumbs.db
